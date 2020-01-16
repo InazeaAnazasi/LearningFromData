@@ -1,0 +1,147 @@
+---
+title: "02_a2-task5"
+author: "Lukas Schmid"
+date: "16 1 2020"
+output: html_document
+---
+
+Repeat the steps we took in order to get from the Likelihood function representing a linear regression to the optimization problem:
+$$w = arg min \sum_{1}^{N} (y_n - w^Tx_n)^2$$
+
+The likelihood function representing a linear regression is derived by the distribution $p(y|x)$ in a linear model. Since $y = w^T x + \epsilon$ (lecture 3, p. 18), where $\epsilon \sim \mathcal{N}(0, \sigma^2)$ (meaning $\epsilon$ is normally distributed around 0 with a standard deviation of $\sigma^2$), $y$ is itself normally distributed and has a mean of $y = w^T x$ and a standard deviation of $\sigma^2$.
+
+The normal distribution $\mathcal{N}(0, \sigma^2)$ has the probability density function:
+$$
+\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x- \mu}{\sigma})^2} = \notag \\
+= \frac{1}{\sigma\sqrt{2\pi}}\text{exp}(-\frac{1}{2}(\frac{x- \mu}{\sigma})^2) = \notag \\
+= \frac{1}{\sigma\sqrt{2\pi}}\text{exp}(-\frac{(x-\mu)^2}{2\sigma^2})
+$$
+
+Inserting $y$ into this equation, we get:
+$$p(y|x) = \frac{1}{\sigma\sqrt{2\pi}}\text{exp}(-\frac{(y-w^T x)^2}{2\sigma^2})$$
+
+Assuming independence of $\forall y \in Y$, we can calculate $P(Y | w, X)$ as the product of $\prod_{n=1}^{N}p(y_n | x_n)$. This probability is the likelihood $\mathcal{L}$ of generating a data $D$, given a certain $w$. Put in another way, we calculate how probable it is that the observed data has been generated using a given w.
+
+$$\mathcal{L}(w|D) \prod_{n=1}^{N}p(y_n | x_n) \\
+ \prod_{n=1}^{N}\Bigg[\frac{1}{\sigma\sqrt{2\pi}}\text{exp}\bigg(-\frac{(y_n-w^T x_n)^2}{2\sigma^2}\bigg)\Bigg]$$
+
+This is still what we covered in class. Now, the task is to choose $w$ as to maximise $\mathcal{L}(w|D)$:
+
+$$\underset{w}{\text{arg max }}\mathcal{L}(w|D) = \text{max }\mathcal{L}(w|D) = \text{max}\big(\text{log }\mathcal{L}(w|D)\big)$$
+
+since the logarithm is a monotone function. Just looking at the part we try to maximise:
+
+$$\text{log }\mathcal{L}(w|D) = \text{log }\big( \prod_{n=1}^{N}\Bigg[\frac{1}{\sigma\sqrt{2\pi}}\text{exp}\bigg(-\frac{(y_n-w^T x_n)^2}{2\sigma^2}\bigg)\Bigg]\big) \\
+= 
+\text{log }\big( 
+	\prod_{n=1}^{N}\Bigg[
+		\frac{1}{\sigma\sqrt{2\pi}}
+	\Bigg]
+	\prod_{n=1}^{N}\Bigg[
+		\text{exp}\bigg(
+			-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+		\bigg)
+	\Bigg]
+\big) \\
+=
+\text{log }\big( 
+	\prod_{n=1}^{N}\Bigg[
+		\frac{1}{\sigma\sqrt{2\pi}}
+	\Bigg]
+\big) + 
+\text{log }\big( 
+	\prod_{n=1}^{N}\Bigg[
+		\text{exp}\bigg(
+			-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+		\bigg)
+	\Bigg]
+\big) \\
+=
+\text{log }\big( 
+	\Bigg[
+		\frac{1}{\sigma\sqrt{2\pi}}
+	\Bigg]^N
+\big) + 
+\text{log }\big( 
+	\prod_{n=1}^{N}\Bigg[
+		\text{exp}\bigg(
+			-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+		\bigg)
+	\Bigg]
+\big) \\
+=
+\text{log }1 - 
+\text{log }\big( 
+	(\sigma\sqrt{2\pi})^N
+\big) + 
+\text{log }\big( 
+	\prod_{n=1}^{N}\Bigg[
+		\text{exp}\bigg(
+			-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+		\bigg)
+	\Bigg]
+\big) \\
+=
+- \text{log}\big( 
+	(\sigma\sqrt{2\pi})^N
+\big) + 
+\text{log}\big( 
+	\prod_{n=1}^{N}\Bigg[
+		\text{exp}\bigg(
+			-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+		\bigg)
+	\Bigg]
+\big) \\
+=
+- \text{log}\big( 
+	(\sigma\sqrt{2\pi})^N
+\big) + 
+\sum_{n=1}^{N}\Bigg[
+	\text{log}\big( 
+		\text{exp}\bigg(
+			-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+		\bigg)
+	\big)
+\Bigg] \\
+=
+- \text{log}\big( 
+	(\sigma\sqrt{2\pi})^N
+\big) + 
+\sum_{n=1}^{N}\Bigg[
+	\text{log}(e)\cdot
+	\big( 
+		-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+	\big)
+\Bigg] \\
+=
+- \text{log}\big( 
+	(\sigma\sqrt{2\pi})^N
+\big) + 
+\sum_{n=1}^{N}\Bigg[
+	-\frac{(y_n-w^T x_n)^2}{2\sigma^2}
+\Bigg] \\
+=
+- \text{log}\big( 
+	(\sigma\sqrt{2\pi})^N
+\big) -
+\frac{1}{2\sigma^2}\sum_{n=1}^{N}(y_n-w^T x_n)^2 $$
+
+The last line is almost the term on page 20 of lecture 3 (the difference lies with the term $-\frac{1}{2\sigma^2}$, in the slides it is $-\frac{1}{\sigma^2}$). 
+
+Instead of maximising the function, we can minimise its gradient:
+
+$$\underset{w}{\text{arg max }}\mathcal{L}(w|D) \\
+= \underset{w}{\text{arg min }}\frac{\partial}{\partial w}\mathcal{L}(w|D) \\
+= \underset{w}{\text{arg min }}\frac{\partial}{\partial w}\Big[
+	- \text{log}\big( 
+		(\sigma\sqrt{2\pi})^N
+	\big) -
+	\frac{1}{2\sigma^2}\sum_{n=1}^{N}(y_n-w^T x_n)^2
+\Big]$$
+
+Sadly, I don't know enough about gradients (yet) to calculate this specific one (any help and resources are welcome). From what I assume, we can treat this gradient as if it was a simple derivative of w, which would drop $-\text{log}\big((\sigma\sqrt{2\pi})^N\big)$. Anyway, since we only want to minimise the function, we do not care for any constant terms, so we can also drop 
+$\frac{1}{2\sigma^2}$. 
+
+Thus, the best hypothesis or $w$ is that which minimises w such that:
+
+$$w = \underset{w}{\text{arg min }}\sum_{n=1}^{N}(y_n-w^T x_n)^2$$
